@@ -1,0 +1,75 @@
+---
+title: "UTS DMKM"
+author: "Komang Uning Sari Devi"
+date: "10/27/2020"
+output: html_document
+---
+
+JUDUL : DATA MODELING DENGAN
+
+langkah-langkah data mining :
+1. data selection (cek korelasi)
+2. pre-processing/cleaning
+3. transformation
+4. data mining
+5. interpretation and evaluation
+
+cek outlier :
+boxplot(data$value, main="value", sub=paste("outlierrow : " , boxplot.stats(test$value)$out))
+
+nilai_outlier<-boxplot.stats(test$value)$out
+which.boxplot.stats(test$value)$out
+nilai_outlier
+
+
+_Library_
+```{r}
+library(dplyr)
+library(visdat)
+library(corrplot)
+library(neuralnet)
+library(party)
+library(caret)
+
+```
+_data selection_
+```{r}
+setwd("C:/Users/UNING/Documents/datmin")
+sonar
+str(sonar)
+dim(sonar)
+sapply(sonar, function(x) sum(is.na(x))) #tidak ada missing value
+```
+
+```{r}
+set.seed(1234)
+sampel <- sample(2,nrow(sonar),replace = T, prob = c(0.8,0.2))
+data_train <- sonar[sampel==1, ]
+data_test <- sonar[sampel==2, ]
+print(paste("Jumlah data training :", nrow(data_train)))
+print(paste("Jumlah data test :", nrow(data_test)))
+head(data_train)
+```
+```{r}
+colnames(sonar)
+model<-neuralnet(X61~., data = data_train, hidden = 3, err.fct = "ce", linear.output = FALSE)
+model$result.matrix
+win.graph()
+plot(model)
+
+#evaluasi
+pred1 <- compute(model,data_test[1:61])
+pred1.r <- round(pred1$net.result)
+
+#confusion matrix
+library(caret)
+head(sonar)
+sonar[,61]=as.factor(sonar[,61])
+```
+sonar <- within(mtcars, {kategori <- Recode(X61,
+          `"R"=1;"M"=0,
+          as.numeric=TRUE)
+})
+confusionMatrix(pred1.r,data_test$X61)
+
+
